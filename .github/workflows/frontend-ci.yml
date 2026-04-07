@@ -32,7 +32,7 @@ jobs:
   #       bun run test
   check-code:
     name: Check code style
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     defaults:
       run:
         working-directory: ./frontend
@@ -50,15 +50,15 @@ jobs:
         bun run lint
   docker:
     name: Build and publish docker image
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     # needs: [test, check-code]
     needs: [check-code]
     steps:
       - uses: actions/checkout@master
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@v1
       - name: Fetch docker metadata
         id: docker_meta
         uses: docker/metadata-action@v5
@@ -72,15 +72,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v6
+        uses: useblacksmith/build-push-action@v2
         env:
           GIT_HASH: ${{ steps.push-changes.outputs.commit-hash }}
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           platforms: linux/amd64,linux/arm64/v8
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}

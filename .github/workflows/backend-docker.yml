@@ -39,21 +39,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@v1
 
       - uses: actions/checkout@master
 
       - name: Build and push
         id: build
-        uses: docker/build-push-action@v6
+        uses: useblacksmith/build-push-action@v2
         env:
           GIT_HASH: ${{ steps.push-changes.outputs.commit-hash }}
         with:
           context: ./backend
           file: ./backend/Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ghcr.io/udaltsovk/${{ inputs.crate }}
@@ -80,7 +78,7 @@ jobs:
 
   merge:
     name: Merge digests and publish docker image
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     needs:
       - build
     steps:
@@ -98,8 +96,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@v1
 
       - name: Docker meta
         id: meta

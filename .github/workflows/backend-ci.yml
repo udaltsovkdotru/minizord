@@ -27,10 +27,10 @@ jobs:
         build: [stable, nightly]
         include:
           - build: stable
-            os: ubuntu-latest
+            os: blacksmith-4vcpu-ubuntu-2404
             rust: stable
           - build: nightly
-            os: ubuntu-latest
+            os: blacksmith-4vcpu-ubuntu-2404
             rust: nightly
     steps:
     - uses: actions/checkout@master
@@ -44,7 +44,7 @@ jobs:
 
   check-code:
     name: Check code style
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     defaults:
       run:
         working-directory: ./backend
@@ -64,7 +64,7 @@ jobs:
         cargo +stable clippy --all -- -D warnings
   check-deps:
     name: Check for unused or insecure dependencies
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     defaults:
       run:
         working-directory: ./backend
@@ -88,7 +88,7 @@ jobs:
         cargo audit
   openapi:
     name: Build and push openapi.Json
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     needs: [test, check-code, check-deps]
     defaults:
       run:
